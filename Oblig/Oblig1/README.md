@@ -1,5 +1,13 @@
 # Oblig 1
 
+Includes the following:
+- segmentation_models.py
+- train.py
+- dataset for roads images
+- images: results for loss for deafult and UNET model
+- pdf file for problem
+- models which were trained: model0 (default) and unet (unet architecture)
+
 ## 3.1 - Write train and val method
 Pulled code mostly from lecutre slides.
 
