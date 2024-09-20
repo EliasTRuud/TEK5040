@@ -194,8 +194,8 @@ def main(train_dir):
 
     train_data = get_train_data(indices[:272], train_batch_size)
     val_data = get_val_data(indices[272:], val_batch_size)
-    model = segmentation_models.simple_model((HEIGHT, WIDTH, 3))
-    #model = segmentation_models.unet((HEIGHT, WIDTH, 3))
+    #model = segmentation_models.simple_model((HEIGHT, WIDTH, 3))
+    model = segmentation_models.unet((HEIGHT, WIDTH, 3))
     loss_fn = get_loss_fn()
     metric_fn = preds_evaluated
     optimizer = get_optimizer()
@@ -218,9 +218,27 @@ def main(train_dir):
         """
 
         # TODO: Implement
-        y_pred = model(image) # TODO: Remove this line if you like
+        #y_pred = model(image) # TODO: Remove this line if you like
+       
+        # tape records for training
+        with tf.GradientTape() as tape:
+            # Predictions through model and compute loss
+            y_pred = model(image, training=True)
+            loss = loss_fn(y, y_pred)
+        
+        # Compute the gradients
+        grads = tape.gradient(loss, model.trainable_variables)
+        
+        #Apply the gradients to update model parameters
+        optimizer.apply_gradients(zip(grads, model.trainable_variables))
+        
+        m = metric_fn(y, y_pred)  
+        train_loss.update_state(loss)  # training loss
+        train_accuracy.update_state(m)  # training acc
+        
+        return y_pred  
+    
 
-        return y_pred
 
     def val_step(image, y):
         """Update `val_loss` and `val_accuracy`.
@@ -232,11 +250,17 @@ def main(train_dir):
         Returns:
           float tensor of shape [batch_size, height, width, 1] with probabilties
         """
-
         # TODO: Implement
-        y_pred = model(image) # TODO: Remove this line if you like
-
-        return y_pred
+        y_pred = model(image, training=False)
+        #Compute the loss between predictions and ground truth
+        loss = loss_fn(y, y_pred)
+        
+        # Calculate metrrics
+        m = metric_fn(y, y_pred)  # metric
+        val_loss.update_state(loss)  # update the loss
+        val_accuracy.update_state(m)  #update acc
+        
+        return y_pred  # Optionally return predictions for logging or further analysis
 
     print("Summaries are written to '%s'." % train_dir)
     train_writer = tf.summary.create_file_writer(
