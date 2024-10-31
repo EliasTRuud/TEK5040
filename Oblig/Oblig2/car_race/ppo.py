@@ -9,9 +9,9 @@ import gym
 sys.path.append("../")
 
 
-from car_race.common import preprocess, ActionEncoder
-from car_race.eval_policy import eval_policy
-from car_race.networks import FeatureExtractor, PolicyNetwork, ValueNetwork
+from common import preprocess, ActionEncoder
+from eval_policy import eval_policy
+from networks import FeatureExtractor, PolicyNetwork, ValueNetwork
 
 
 # Hold episode data
@@ -103,10 +103,17 @@ def calculate_returns(rewards, gamma):
     Returns:
         returns: array of return for each time step, i.e. [g_0, g_1, ... g_{T-1}]
     """
+    # Rewards contains rewards for one episode and gamma is used to discount future rwards.
+    # Loop through and sum up rewards for each time step and let gamma exponent increase as further away
 
+    len_r = len(rewards)
+    returns = np.zeros(len_r, dtype=np.float32)
 
-    returns = np.zeros(len(rewards), dtype=np.float32)
-    # TODO: Calculate returns
+    for i in range(len_r):
+        cum_rew = 0
+        for j in range(i, len_r):
+            cum_rew += rewards[j] * (gamma**(j-i))
+        returns[i] = cum_rew
 
     return returns
 
@@ -120,9 +127,10 @@ def value_loss(target, prediction):
     Returns:
         loss : mean squared error difference between predictions and targets
     """
-
-    # TODO: Implement value loss
-    return tf.zeros(tf.shape(target), dtype=tf.float32)  # Remove this line
+    # Simple mean of squared difference between target and target value
+    sq_diff = tf.square(target - prediction)
+    loss = tf.reduce_mean(sq_diff)
+    return loss 
 
 def policy_loss(pi_a, pi_old_a, advantage, epsilon):
     """Calculate policy loss as in https://arxiv.org/abs/1707.06347
@@ -139,9 +147,10 @@ def policy_loss(pi_a, pi_old_a, advantage, epsilon):
     Returns:
         loss : scalar loss value
     """
-
-    # TODO: implement policy loss
-    loss = tf.constant(0, dtype=tf.float32)  # remove this line
+    ratio = pi_a / pi_old_a # u_i, ratio between new and old policies
+    loss = ratio * advantage # u_i * d_hat_i
+    clipped_loss = tf.clip_by_value(loss, 1-epsilon, 1+epsilon) * advantage 
+    loss = -tf.reduce_mean(tf.minimum(clipped_loss, loss)) # -1/N * min(u_i, u_i_clipped), GPT line
 
     return loss
 
