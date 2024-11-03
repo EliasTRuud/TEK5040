@@ -31,3 +31,16 @@ Lines:
     9: Set surrogate objective L based on the sampled data.
     10: Optimize surrogate L wrt. η and θ, for K epochs and
     11: minibatch size M ≤∑ τ(i) - from i= 1 -> N
+
+
+
+Task 1: Implement calculate_returens()
+    - Line 95
+    - 
+
+Task 2: Implement the value_loss()
+
+Task 3: Implement policy_loss()
+
+Task 4: Optimize surrogate loss
+    - Line 347
