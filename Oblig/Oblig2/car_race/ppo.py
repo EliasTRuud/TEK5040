@@ -259,7 +259,7 @@ class Agent(tf.keras.models.Model):
 
 def main():
 
-    run_name = "ppo_linear"
+    run_name = "ppo"
     base_dir = os.path.join("train_out", run_name)
     os.makedirs(base_dir, exist_ok=True)
     # TODO: Seeds
@@ -351,10 +351,30 @@ def main():
         # maximize), take the gradient of the loss with respect to the trainable
         # variables of both 'policy_network' and 'value_network', and update the
         # variables using the optimizer.
+
+        # helped with gpt as unsure how to use tape
         for epoch in range(K):
             for batch in dataset:
                 obs, action, advantage, pi_old, value_target, t = batch
 
+                with tf.GradientTape(persistent=True) as tape:
+                    logits = policy_network.policy(obs)
+                    action_prob = activations.softmax(logits)
+                    # select action prob
+                    selected_action_prob = tf.reduce_sum(action_prob * tf.one_hot(action, action_prob.shape[-1]), axis=-1)
+                    v = value_network(obs, maxlen-t)
+
+                    #losses
+                    policy_loss_val = policy_loss(selected_action_prob, pi_old, advantage, epsilon)
+                    value_loss_val = value_loss(value_target, v)
+                    entropy_loss_val = entropy_loss(action_prob)
+                    # Total loss
+                    loss = policy_loss_val + c1*value_loss_val + c2*entropy_loss_val
+
+                
+                # Compute gradients and apply them
+                gradients = tape.gradient(loss, policy_network.trainable_variables + value_network.trainable_variables)
+                optimizer.apply_gradients(zip(gradients, policy_network.trainable_variables + value_network.trainable_variables))
 
 
         print("Iteration %d. Optimized surrogate loss in %f sec." %
