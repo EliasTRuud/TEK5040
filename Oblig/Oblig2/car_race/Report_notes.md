@@ -1,5 +1,6 @@
 ### Report: Questions answered
 
+Github link: https://github.com/EliasTRuud/TEK5040/tree/main/Oblig/Oblig2
 #### 3.1 Actor critic:
 A: For actor critic network consists of 2 parts, the first part takes action (e.g go left). This is the policy_network (line 274). The goal is to optimize the rewards. The critic evaluates the actions. Which it uses to improve the policy. For this code the critic is the value network (line 284).
 An advantage of the critic is e.g improved sample efficiency, meaning less interaction and training time for our policy to become good. Also faster convergence since we can update both policy and value network concurrently.  (https://www.geeksforgeeks.org/actor-critic-algorithm-in-reinforcement-learning/)
