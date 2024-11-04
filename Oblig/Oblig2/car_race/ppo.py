@@ -360,12 +360,14 @@ def main():
                 with tf.GradientTape(persistent=True) as tape:
                     logits = policy_network.policy(obs)
                     action_prob = activations.softmax(logits)
-                    # select action prob
-                    selected_action_prob = tf.reduce_sum(action_prob * tf.one_hot(action, action_prob.shape[-1]), axis=-1)
+                
                     v = value_network(obs, maxlen-t)
 
-                    #losses
-                    policy_loss_val = policy_loss(selected_action_prob, pi_old, advantage, epsilon)
+                    # Calc action probs , gpt helped to fix error
+                    selected_action_prob = tf.reduce_sum(action_prob * tf.one_hot(action, action_prob.shape[-1]), axis=-1)
+                    pi_old_a = tf.reduce_sum(pi_old * tf.one_hot(action, depth=pi_old.shape[-1]), axis=-1)
+                    policy_loss_val = policy_loss(selected_action_prob, pi_old_a, advantage, epsilon)
+
                     value_loss_val = value_loss(value_target, v)
                     entropy_loss_val = entropy_loss(action_prob)
                     # Total loss
