@@ -78,4 +78,5 @@ plt.fill_between(X_test.ravel(),
                  color='yellow')
 plt.title('Prediction')
 plt.legend();
+plt.savefig("vi_plot_4.png")
 plt.show()

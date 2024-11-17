@@ -61,6 +61,7 @@ plt.fill_between(X_test.ravel(),
                 color='yellow')
 plt.title('Prediction')
 plt.legend();
+plt.savefig("mc_plot5.png")
 plt.show()
 
 

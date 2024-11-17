@@ -33,4 +33,4 @@ def neg_log_likelihood(y_obs, y_pred, sigma=noise):
 
 
 if __name__ == "__main__":
-    gen_data(32,1.0, True)
+    gen_data(32,1.0, True) #noise = 1.0
