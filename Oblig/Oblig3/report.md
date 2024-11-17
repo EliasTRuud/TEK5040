@@ -18,9 +18,9 @@ where we add it the loss function as described in the equation. The actual calcu
 
 
 #### 5:
-Partly assuming its to do with the neg_log_likelihood in the common.py file at line 30. Which is then sent into the model in vi_train_test.py at line 40/42 when we compile the model. Referring to the posterior network parameter distribution p(w|D). (But unsure if this line is stricly term 2 or not)
+Partly assuming its to do with the neg_log_likelihood in the common.py file at line 30. Which is then sent into the model in vi_train_test.py at line 40/42 when we compile the model. Referring to the posterior network parameter distribution p(w|D). 
 
 #### 6:
-An advantage of MCMC as stated in lecture is that its asymptotically exact . However it is computationally expensive compared to variataional inference. 
+An advantage of MCMC as stated in lecture is that its asymptotically exact. It generates samples directly from the true posterior distribution. However it is computationally expensive compared to variataional inferencee. 
 
 
